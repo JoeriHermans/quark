@@ -110,6 +110,7 @@ namespace quark {
 
         if(!quark::file_exists(path)) {
             loge("Could not open configuration file at " + path);
+
             return false;
         }
         logi("Reading configuration file at " + path);

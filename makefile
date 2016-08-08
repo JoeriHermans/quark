@@ -16,7 +16,7 @@ CCFLAGS = -D__GXX_EXPERIMENTAL_CXX0X__ -D__cplusplus=201103L -I"src/" \
 SOURCEDIR = src/
 BUILDDIR = build/
 
-SOURCES = $(shell cd $(SOURCEDIR) && find quark/ -name "*.cpp" && cd ..)
+SOURCES = $(shell cd $(SOURCEDIR) && find . -name "*.cpp" && cd ..)
 OBJECTS = $(addprefix build/, $(SOURCES:.cpp=.bc))
 
 NO_COLOR = \x1b[0m

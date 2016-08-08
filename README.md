@@ -8,5 +8,7 @@ Before actually building your application. One should modify the makefile in ord
 
 After all these have been configured, just run `make all`, and the compiled binary will be available in the `bin` folder.
 
+![building](http://joerihermans.com/~joeri/tty_compile_quark.gif)
+
 ### Modifying your compiler
 By default, quark makes use of the `g++` compiler. However, it is not a problem if you would like to change to `clang`. One just needs to modify the CC, and LD variable.

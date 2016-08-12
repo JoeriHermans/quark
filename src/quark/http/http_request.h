@@ -74,6 +74,11 @@ class http_request {
      */
     std::string mUri;
 
+    /**
+     * Holds the body of the HTTP request.
+     */
+    std::string mBody;
+
     // END Private members. //////////////////////////////////////////////////
 
     // BEGIN Private methods. ////////////////////////////////////////////////
@@ -83,6 +88,8 @@ class http_request {
     inline void set_host(const std::string & host);
 
     inline void set_uri(const std::string & uri);
+
+    inline void set_body(const std::string & body);
 
     std::string build_request(void) const;
 
@@ -100,6 +107,11 @@ class http_request {
     http_request(const quark::http_method method,
                  const std::string & host,
                  const std::string & uri);
+
+    http_request(const quark::http_method method,
+                 const std::string & host,
+                 const std::string & uri,
+                 const std::string & body);
 
     // END Constructor. //////////////////////////////////////////////////////
 

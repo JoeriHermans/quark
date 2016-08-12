@@ -28,7 +28,9 @@
 #include <cassert>
 
 // Application dependencies.
+#include <quark/application/constants.h>
 #include <quark/http/http_request.h>
+#include <quark/http/http_util.h>
 
 // END Includes. /////////////////////////////////////////////////////
 
@@ -50,10 +52,21 @@ inline void quark::http_request::set_uri(const std::string & uri) {
     mUri = uri;
 }
 
-std::string quark::http_request::build_request(void) const {
-    std::string request = "";
+inline void quark::http_request::set_body(const std::string & body) {
+    set_header(kHttpHeaderContentLength, std::to_string(body.length()));
+    mBody = body;
+}
 
-    // TODO Implement.
+std::string quark::http_request::build_request(void) const {
+    std::string request;
+
+    request = http_method_to_string(mHttpMethod);
+    request += " " + mUri + "\r\n";
+    // Add all headers to the request.
+    for(auto it = mHeader.begin(); it != mHeader.end(); ++it)
+        request += it->first + ": " + it->second + "\r\n";
+    // Append the body seperator and body.
+    request += "\r\n\r\n" + mBody;
 
     return request;
 }
@@ -64,6 +77,17 @@ quark::http_request::http_request(const quark::http_method method,
     set_http_method(method);
     set_host(host);
     set_uri(uri);
+    set_body("");
+}
+
+quark::http_request::http_request(const quark::http_method method,
+                                  const std::string & host,
+                                  const std::string & uri,
+                                  const std::string & body) {
+    set_http_method(method);
+    set_host(host);
+    set_uri(uri);
+    set_body(body);
 }
 
 quark::http_request::~http_request(void) {

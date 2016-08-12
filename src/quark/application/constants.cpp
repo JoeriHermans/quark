@@ -39,4 +39,6 @@ const char kHttpMethodGet[] = "GET";
 const char kHttpMethodPost[] = "POST";
 const char kHttpMethodUnknown[] = "UNKNOWN";
 
+const char kHttpHeaderContentLength[] = "Content-length";
+
 // END Utility characters. ///////////////////////////////////////////

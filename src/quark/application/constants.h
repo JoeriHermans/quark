@@ -35,6 +35,8 @@ extern const char kHttpMethodGet[];
 extern const char kHttpMethodPost[];
 extern const char kHttpMethodUnknown[];
 
+extern const char kHttpHeaderContentLength[];
+
 // END Utility constants. ////////////////////////////////////////////
 
 #endif

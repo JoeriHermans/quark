@@ -84,6 +84,8 @@ class http_request {
 
     inline void set_uri(const std::string & uri);
 
+    std::string build_request(void) const;
+
     // END Private methods. //////////////////////////////////////////////////
 
     protected:

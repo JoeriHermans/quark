@@ -50,6 +50,14 @@ inline void quark::http_request::set_uri(const std::string & uri) {
     mUri = uri;
 }
 
+std::string quark::http_request::build_request(void) const {
+    std::string request = "";
+
+    // TODO Implement.
+
+    return request;
+}
+
 quark::http_request::http_request(const quark::http_method method,
                                   const std::string & host,
                                   const std::string & uri) {
@@ -83,9 +91,20 @@ std::string quark::http_request::get_header(const std::string & key) const {
 
 quark::http_response * quark::http_request::execute(quark::socket * socket) {
     quark::http_response * response = nullptr;
+    quark::reader * reader;
+    quark::writer * writer;
 
     // Checking the precondition.
-    assert(socket != nullptr);
+    assert(socket != nullptr && socket->is_connected());
+
+    writer = socket->get_writer();
+    reader = socket->get_reader();
+    const std::string & request = build_request();
+    writer->write_all(request.c_str(), request.length());
+
+    reader = socket->get_reader();
+    reader->lock();
+    reader->unlock();
 
     return response;
 }

@@ -30,6 +30,11 @@
 
 extern const char kTrimCharacters[];
 
+extern const char kHttpMethodDelete[];
+extern const char kHttpMethodGet[];
+extern const char kHttpMethodPost[];
+extern const char kHttpMethodUnknown[];
+
 // END Utility constants. ////////////////////////////////////////////
 
 #endif

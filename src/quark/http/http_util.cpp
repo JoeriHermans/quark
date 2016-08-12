@@ -23,22 +23,29 @@
 
 // BEGIN Includes. ///////////////////////////////////////////////////
 
-// System dependencies.
-#include <string>
-
 // Application dependencies.
-#include <quark/http/http_code.h>
-#include <quark/http/http_method.h>
+#include <quark/application/constants.h>
+#include <quark/http/http_util.h>
 
 // END Includes. /////////////////////////////////////////////////////
 
-#ifndef QUARK_HTTP_UTIL_H_
-#define QUARK_HTTP_UTIL_H_
+std::string quark::http_method_to_string(const quark::http_method method) {
+    std::string str;
 
-namespace quark {
+    switch(method) {
+    case quark::http_method::GET:
+        str = kHttpMethodGet;
+        break;
+    case quark::http_method::POST:
+        str = kHttpMethodPost;
+        break;
+    case quark::http_method::DELETE:
+        str = kHttpMethodDelete;
+        break;
+    default:
+        str = kHttpMethodUnknown;
+        break;
+    }
 
-std::string http_method_to_string(const quark::http_method method);
-
-};
-
-#endif
+    return str;
+}

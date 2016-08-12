@@ -34,4 +34,9 @@
 
 const char kTrimCharacters[] = " \t\n\r";
 
+const char kHttpMethodDelete[] = "DELETE";
+const char kHttpMethodGet[] = "GET";
+const char kHttpMethodPost[] = "POST";
+const char kHttpMethodUnknown[] = "UNKNOWN";
+
 // END Utility characters. ///////////////////////////////////////////

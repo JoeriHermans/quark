@@ -91,6 +91,8 @@ class http_request {
 
     inline void set_body(const std::string & body);
 
+    quark::http_response * fetch_response(quark::reader * reader) const;
+
     std::string build_request(void) const;
 
     // END Private methods. //////////////////////////////////////////////////

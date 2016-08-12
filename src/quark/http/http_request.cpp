@@ -57,6 +57,14 @@ inline void quark::http_request::set_body(const std::string & body) {
     mBody = body;
 }
 
+quark::http_response * quark::http_request::fetch_response(quark::reader * reader) const {
+    quark::http_response * response = nullptr;
+
+    // TODO Implement.
+
+    return response;
+}
+
 std::string quark::http_request::build_request(void) const {
     std::string request;
 
@@ -114,7 +122,7 @@ std::string quark::http_request::get_header(const std::string & key) const {
 }
 
 quark::http_response * quark::http_request::execute(quark::socket * socket) {
-    quark::http_response * response = nullptr;
+    quark::http_response * response;
     quark::reader * reader;
     quark::writer * writer;
 
@@ -128,6 +136,7 @@ quark::http_response * quark::http_request::execute(quark::socket * socket) {
 
     reader = socket->get_reader();
     reader->lock();
+    response = fetch_response(reader);
     reader->unlock();
 
     return response;

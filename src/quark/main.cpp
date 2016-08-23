@@ -44,38 +44,11 @@
 
 // END Includes. /////////////////////////////////////////////////////
 
-// BEGIN Tests. //////////////////////////////////////////////////////
-
-// Test dependencies.
-#include <quark/http/http_request.h>
-#include <quark/http/http_response.h>
-#include <quark/network/socket.h>
-#include <quark/network/posix/posix_tcp_socket.h>
-
-void execute_tests(void) {
-    quark::http_request request(quark::http_method::GET, "joerihermans.com", "/");
-    quark::http_response * response;
-    quark::posix_tcp_socket socket;
-
-    if(socket.create_connection("joerihermans.com", 80)) {
-        response = request.execute(&socket);
-        std::cout << "Number of header elements: " << response->header_size() << std::endl;
-        std::cout << response->get_body() << std::endl;
-        delete response;
-        socket.close_connection();
-    } else {
-        std::cout << "Could not create connection." << std::endl;
-    }
-}
-
-// END Tests. ////////////////////////////////////////////////////////
-
 int main(const int argc, const char ** argv) {
     // Initialize dependencies.
     initialize_random_number_generator();
     initialize_ssl();
     // TODO Initialize and start application.
-    execute_tests();
     // Do some cleanup.
     cleanup_logger();
     cleanup_ssl();

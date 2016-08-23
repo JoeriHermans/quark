@@ -27,8 +27,6 @@
 
 int main(const int argc, const char ** argv);
 
-void execute_tests(void);
-
 void cleanup_logger(void);
 
 void cleanup_ssl(void);

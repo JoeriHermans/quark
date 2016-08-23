@@ -102,6 +102,8 @@ class http_response {
 
     bool has_header(const std::string & key) const;
 
+    std::size_t header_size(void) const;
+
     const std::string & get_header(const std::string & key) const;
 
     const std::string & get_body(void) const;

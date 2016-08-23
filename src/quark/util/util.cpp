@@ -136,6 +136,34 @@ namespace quark {
         s.erase(s.find_last_not_of(kTrimCharacters) + 1);
     }
 
+    std::vector<std::string> split(const std::string & s, const std::string & delimiter) {
+        std::vector<std::string> elements;
+        std::string token;
+        std::size_t ppos;
+        std::size_t pos;
+
+        ppos = 0;
+        while((pos = s.find(delimiter, ppos)) != std::string::npos) {
+            token = s.substr(ppos, pos - ppos);
+            elements.push_back(token);
+            ppos = pos + delimiter.length();
+        }
+
+        return elements;
+    }
+
+    std::pair<std::string, std::string> split_pair(const std::string & s, const std::string & delimiter) {
+        std::pair<std::string, std::string> tuple;
+        std::size_t pos;
+
+        pos = s.find(delimiter);
+        tuple.first = s.substr(0, pos);
+        pos += delimiter.length();
+        tuple.second = s.substr(pos, s.length() - pos);
+
+        return tuple;
+    }
+
     std::string sha256(const std::string & str,
                        const std::string & presalt,
                        const std::string & postsalt) {

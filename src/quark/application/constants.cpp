@@ -34,11 +34,24 @@
 
 const char kTrimCharacters[] = " \t\n\r";
 
+const char kHttpSeparator[] = "\r\n";
 const char kHttpMethodDelete[] = "DELETE";
 const char kHttpMethodGet[] = "GET";
 const char kHttpMethodPost[] = "POST";
 const char kHttpMethodUnknown[] = "UNKNOWN";
 
 const char kHttpHeaderContentLength[] = "Content-length";
+const char kHttpHeaderCacheControl[] = "Cache-Control";
+const char kHttpHeaderNoCache[] = "no-cache";
+const char kHttpHeaderConnection[] = "Connection";
+const char kHttpHeaderClose[] = "close";
+const char kHttpHeaderKeepAlive[] = "keep-alive";
+const char kHttpHeaderAccept[] = "Accept";
+const char kHttpHeaderKeyValueSeparator[] = ":";
+
+const char kMimeTextPlain[] = "text/plain";
+const char kMimeTextHtml[] = "text/html";
+const char kMimeTextJson[] = "text/json";
+const char kMimeAll[] = "*/*";
 
 // END Utility characters. ///////////////////////////////////////////

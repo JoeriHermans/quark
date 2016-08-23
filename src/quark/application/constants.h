@@ -31,11 +31,25 @@
 extern const char kTrimCharacters[];
 
 extern const char kHttpMethodDelete[];
+extern const char kHttpSeparator[];
 extern const char kHttpMethodGet[];
 extern const char kHttpMethodPost[];
 extern const char kHttpMethodUnknown[];
 
 extern const char kHttpHeaderContentLength[];
+extern const char kHttpHeaderCacheControl[];
+extern const char kHttpHeaderNoCache[];
+extern const char kHttpHeaderConnection[];
+extern const char kHttpHeaderClose[];
+extern const char kHttpHeaderKeepAlive[];
+extern const char kHttpHeaderAccept[];
+extern const char kHttpHeaderLocation[];
+extern const char kHttpHeaderKeyValueSeparator[];
+
+extern const char kMimeTextPlain[];
+extern const char kMimeTextHtml[];
+extern const char kMimeTextJson[];
+extern const char kMimeAll[];
 
 // END Utility constants. ////////////////////////////////////////////
 

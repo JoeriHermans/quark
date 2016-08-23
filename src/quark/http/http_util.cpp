@@ -23,11 +23,32 @@
 
 // BEGIN Includes. ///////////////////////////////////////////////////
 
+// System dependencies.
+#include <cassert>
+#include <cstring>
+#include <vector>
+#include <sstream>
+#include <iostream>
+
 // Application dependencies.
 #include <quark/application/constants.h>
 #include <quark/http/http_util.h>
+#include <quark/util/util.h>
 
 // END Includes. /////////////////////////////////////////////////////
+
+quark::http_code quark::parse_http_code(const std::string & s) {
+    quark::http_code code;
+    std::size_t pos;
+
+    // Find the end of the protocol.
+    pos = s.find(" ") + 1;
+    // Find the status code.
+    std::string statusCode = s.substr(pos, s.find(" ", pos) - pos);
+    code = static_cast<quark::http_code>(std::stoi(statusCode));
+
+    return code;
+}
 
 std::string quark::http_method_to_string(const quark::http_method method) {
     std::string str;
@@ -48,4 +69,32 @@ std::string quark::http_method_to_string(const quark::http_method method) {
     }
 
     return str;
+}
+
+std::pair<std::string, std::string> quark::split_response(const std::string & s) {
+    const static std::size_t delimiterLength = strlen(kHttpSeparator);
+    std::pair<std::string, std::string> tuple;
+    std::string token;
+    std::string header;
+    std::size_t ppos;
+    std::size_t pos;
+
+    ppos = pos = 0;
+    while((pos = s.find(kHttpSeparator, ppos)) != std::string::npos) {
+        token = s.substr(ppos, pos - ppos);
+        // Check if the specified token is empty, this means we reached the body.
+        if(token.empty()) {
+            pos += delimiterLength;
+            break;
+        }
+        header += token + kHttpSeparator;
+        ppos = pos + delimiterLength;
+    }
+    // Check if pos is not a position.
+    if(pos == std::string::npos)
+        pos = 0;
+    tuple.first = header;
+    tuple.second = s.substr(pos, s.length() - pos);
+
+    return tuple;
 }

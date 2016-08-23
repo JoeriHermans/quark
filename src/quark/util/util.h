@@ -27,6 +27,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <utility>
 
 // END Includes. /////////////////////////////////////////////////////
 
@@ -47,6 +48,10 @@ namespace quark {
     std::string sha256(const std::string & str,
                        const std::string & preSalt,
                        const std::string & postSalt);
+
+    std::vector<std::string> split(const std::string & s, const std::string & delimiter);
+
+    std::pair<std::string, std::string> split_pair(const std::string & s, const std::string & delimiter);
 
     bool file_exists(const std::string & path);
 

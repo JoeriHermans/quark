@@ -61,6 +61,10 @@ bool quark::http_response::has_header(const std::string & key) const {
     return it != mHeader.end();
 }
 
+std::size_t quark::http_response::header_size(void) const {
+    return mHeader.size();
+}
+
 const std::string & quark::http_response::get_header(const std::string & key) const {
     auto it = mHeader.find(key);
 

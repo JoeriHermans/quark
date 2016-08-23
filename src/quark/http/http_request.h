@@ -91,7 +91,11 @@ class http_request {
 
     inline void set_body(const std::string & body);
 
-    quark::http_response * fetch_response(quark::reader * reader) const;
+    void add_default_headers(void);
+
+    quark::http_response * build_response(const std::string & data) const;
+
+    quark::http_response * fetch_response(quark::socket * socket) const;
 
     std::string build_request(void) const;
 

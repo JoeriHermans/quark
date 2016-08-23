@@ -26,10 +26,16 @@
 
 // System dependencies.
 #include <cassert>
+#include <cstring>
+#include <string>
+#include <iostream>
 
 // Application dependencies.
 #include <quark/application/constants.h>
+#include <quark/network/socket.h>
 #include <quark/http/http_request.h>
+#include <quark/http/http_util.h>
+#include <quark/util/util.h>
 #include <quark/http/http_util.h>
 
 // END Includes. /////////////////////////////////////////////////////
@@ -57,10 +63,70 @@ inline void quark::http_request::set_body(const std::string & body) {
     mBody = body;
 }
 
-quark::http_response * quark::http_request::fetch_response(quark::reader * reader) const {
-    quark::http_response * response = nullptr;
+void quark::http_request::add_default_headers(void) {
+    set_header(kHttpHeaderConnection, kHttpHeaderClose);
+    set_header(kHttpHeaderCacheControl, kHttpHeaderNoCache);
+    set_header(kHttpHeaderAccept, kMimeAll);
+}
 
-    // TODO Implement.
+quark::http_response * quark::http_request::build_response(const std::string & data) const {
+    std::unordered_map<std::string, std::string> headerMap;
+    std::vector<std::string> headerRows;
+    quark::http_response * response;
+    quark::http_code httpCode = HTTP_UNKNOWN;
+
+    // Check if valid data has been specified.
+    if(data.empty())
+        return nullptr;
+
+    std::pair<std::string, std::string> responseParts = quark::split_response(data);
+    std::string header = responseParts.first;
+    std::string body = responseParts.second;
+    // Check if header data is available.
+    if(!header.empty()) {
+        headerRows = quark::split(header, kHttpSeparator);
+        // Fetch the HTTP code from the first line of the header.
+        httpCode = quark::parse_http_code(*headerRows.begin());
+        // Parse the rest of the header rows.
+        for(auto it = headerRows.begin() + 1; it != headerRows.end(); ++it) {
+            std::pair<std::string, std::string> headerRow;
+
+            headerRow = quark::split_pair(*it, kHttpHeaderKeyValueSeparator);
+            std::string k = headerRow.first;
+            std::string v = headerRow.second;
+            quark::trim(k);
+            quark::trim(v);
+            headerMap[k] = v;
+        }
+    }
+    // Allocate a new response instance.
+    response = new quark::http_response(httpCode, headerMap, body);
+
+    return response;
+}
+
+quark::http_response * quark::http_request::fetch_response(quark::socket * socket) const {
+    quark::http_response * response;
+    quark::reader * reader = socket->get_reader();
+    bool allReceived = false;
+    char buffer[BUFSIZ + 1];
+    std::string data;
+
+    // Checking the precondition.
+    assert(socket != nullptr && reader != nullptr);
+
+    reader->lock();
+    while(!allReceived && socket->is_connected()) {
+        std::size_t n = reader->read_bytes(buffer, BUFSIZ);
+        buffer[n] = 0;
+
+        if(n != 0)
+            data += buffer;
+        else
+            allReceived = true;
+    }
+    reader->unlock();
+    response = build_response(data);
 
     return response;
 }
@@ -83,6 +149,7 @@ quark::http_request::http_request(const quark::http_method method,
                                   const std::string & host,
                                   const std::string & uri) {
     set_http_method(method);
+    add_default_headers();
     set_host(host);
     set_uri(uri);
     set_body("");
@@ -93,6 +160,7 @@ quark::http_request::http_request(const quark::http_method method,
                                   const std::string & uri,
                                   const std::string & body) {
     set_http_method(method);
+    add_default_headers();
     set_host(host);
     set_uri(uri);
     set_body(body);
@@ -123,21 +191,16 @@ std::string quark::http_request::get_header(const std::string & key) const {
 
 quark::http_response * quark::http_request::execute(quark::socket * socket) {
     quark::http_response * response;
-    quark::reader * reader;
     quark::writer * writer;
 
     // Checking the precondition.
     assert(socket != nullptr && socket->is_connected());
 
+    // Write the HTTP request to the remote host.
     writer = socket->get_writer();
-    reader = socket->get_reader();
     const std::string & request = build_request();
     writer->write_all(request.c_str(), request.length());
-
-    reader = socket->get_reader();
-    reader->lock();
-    response = fetch_response(reader);
-    reader->unlock();
+    response = fetch_response(socket);
 
     return response;
 }

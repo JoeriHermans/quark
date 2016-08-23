@@ -30,6 +30,7 @@
 namespace quark {
 
     enum http_code {
+        HTTP_UNKNOWN           = 0,
         HTTP_OK                = 200,
         HTTP_FROBIDDEN         = 403,
         HTTP_NOT_FOUND         = 404,

@@ -25,6 +25,8 @@
 
 // System dependencies.
 #include <string>
+#include <vector>
+#include <utility>
 
 // Application dependencies.
 #include <quark/http/http_code.h>
@@ -37,7 +39,11 @@
 
 namespace quark {
 
+quark::http_code parse_http_code(const std::string & s);
+
 std::string http_method_to_string(const quark::http_method method);
+
+std::pair<std::string, std::string> split_response(const std::string & s);
 
 };
 

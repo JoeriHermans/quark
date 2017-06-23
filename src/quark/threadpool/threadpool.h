@@ -24,12 +24,12 @@
 // BEGIN Includes. ///////////////////////////////////////////////////
 
 // System dependencies.
-#include <vector>
-#include <thread>
-#include <queue>
-#include <mutex>
-#include <ctime>
 #include <condition_variable>
+#include <ctime>
+#include <mutex>
+#include <queue>
+#include <thread>
+#include <vector>
 
 // Application dependencies.
 #include <quark/threadpool/threadpool_task.h>

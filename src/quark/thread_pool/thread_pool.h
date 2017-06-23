@@ -1,11 +1,11 @@
 /**
- * TODO
+ * Highly efficient threadpool with dynamic resource allocation.
  *
- * @date                    TODO
+ * @date                    23 June 2017
  * @author                  Joeri R. HERMANS
  * @version                 0.1
  *
- * Copyright 2016 Joeri R. HERMANS
+ * Copyright 2017 Joeri R. HERMANS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,13 @@
  * limitations under the License.
  */
 
-#ifndef QUARK_THREADPOOL_H_
-#define QUARK_THREADPOOL_H_
+#ifndef QUARK_THREAD_POOL_H_
+#define QUARK_THREAD_POOL_H_
 
-// BEGIN Includes. /////////////////////////////////////////////////////////////
+// BEGIN Dependencies. /////////////////////////////////////////////////////////
 
 // Application dependencies.
+#include <quark/thread_pool/thread_pool_task.h>
 
 // System dependencies.
 #include <vector>
@@ -34,11 +35,11 @@
 #include <mutex>
 #include <queue>
 
-// END Includes. ///////////////////////////////////////////////////////////////
+// END Dependencies. ///////////////////////////////////////////////////////////
 
 namespace quark {
 
-class threadpool {
+class thread_pool {
 
     public:
 
@@ -54,19 +55,37 @@ class threadpool {
      *
      * @note By default, this member if true.
      */
-    bool m_running;
+    bool m_flag_running;
 
-    std::condition_variable m_task_load;
+    /**
+     * Condition variable for waking up inactive threads.
+     */
+    std::condition_variable m_workers;
 
-    std::mutex m_mutes_sleeping_threads;
+    /**
+     * Mutex for accessing the inactive threads registry.
+     */
+    mutable std::mutex m_mutex_active_threads;
 
-    std::mutex m_mutex_queue;
+    /**
+     * Mutex for accessing the task queue.
+     */
+    mutable std::mutex m_mutex_queue;
 
-    std::mutex m_mutex_thread_lock;
+    /**
+     * Mutex for accessing the active threads registry.
+     */
+    mutable std::mutex m_mutex_inactive_threads;
 
-    std::mutex m_mutex_working_threads;
+    /**
+     * Mutable assigned to a thread pool worker.
+     */
+    mutable std::mutex m_mutex_worker;
 
-    std::queue<quark::threadpool_task> m_task_queue;
+    /**
+     * Threadpool task queue.
+     */
+    std::queue<quark::thread_pool_task *> m_task_queue;
 
     /**
      * Holds the number of sleeping (inactive) threads.
@@ -82,13 +101,46 @@ class threadpool {
      */
     std::size_t m_num_active_threads;
 
-    std::vector<std::thread> m_threads;
+    /**
+     * Thread registry.
+     */
+    std::vector<std::thread *> m_threads;
 
     // END Private members. ////////////////////////////////////////////////////
 
     // BEGIN Private methods. //////////////////////////////////////////////////
 
+    bool tasks_left(void) const;
+
     inline void initialize(void);
+
+    inline void lock_queue(void);
+
+    inline void unlock_queue(void);
+
+    quark::thread_pool_task * next_task(void);
+
+    std::size_t num_threads(void) const;
+
+    std::size_t num_threads_active(void) const;
+
+    std::size_t num_threads_inactive(void) const;
+
+    void cleanup_tasks(void);
+
+    void decrement_active_threads(void);
+
+    void decrement_inactive_threads(void);
+
+    void increment_active_threads(void);
+
+    void increment_inactive_threads(void);
+
+    void join(void);
+
+    void spawn_threads(const std::size_t num_threads);
+
+    bool wakeup_required(void) const;
 
     // END Private methods. ////////////////////////////////////////////////////
 
@@ -101,13 +153,13 @@ class threadpool {
 
     // BEGIN Constructor. //////////////////////////////////////////////////////
 
-    threadpool(const std::size_t num_threads);
+    thread_pool(const std::size_t num_workers);
 
     // END Constructor. ////////////////////////////////////////////////////////
 
     // BEGIN Destructor. ///////////////////////////////////////////////////////
 
-    virtual ~threadpool(void);
+    virtual ~thread_pool(void);
 
     // END Destructor. /////////////////////////////////////////////////////////
 
@@ -115,15 +167,18 @@ class threadpool {
 
     bool is_running(void) const;
 
-    std::size_t num_threads(void) const;
+    std::size_t num_workers(void) const;
 
-    void enqueue(quark::threadpool_task & task);
+    void enqueue(quark::thread_pool_task * task);
 
     void stop(void);
 
     // END Public methods. /////////////////////////////////////////////////////
 
     // BEGIN Public static methods. ////////////////////////////////////////////
+
+    static void process(quark::thread_pool * thread_pool);
+
     // END Public static methods. //////////////////////////////////////////////
 
 };

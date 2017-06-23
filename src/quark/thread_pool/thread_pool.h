@@ -68,9 +68,19 @@ class threadpool {
 
     std::queue<quark::threadpool_task> m_task_queue;
 
-    std::size_t m_num_sleeping_threads;
+    /**
+     * Holds the number of sleeping (inactive) threads.
+     *
+     * @note 0 by default.
+     */
+    std::size_t m_num_inactive_threads;
 
-    std::size_t m_num_worker_threads;
+    /**
+     * Holds the number of active (working) threads.
+     *
+     * @note 0 by default.
+     */
+    std::size_t m_num_active_threads;
 
     std::vector<std::thread> m_threads;
 

@@ -25,11 +25,15 @@
 // BEGIN Dependencies. /////////////////////////////////////////////////////////
 
 // Application dependencies.
-#include <quark/network/posix/posix_tcp_socket.h>
 #include <quark/network/network_util.h>
+#include <quark/network/posix/posix_tcp_socket.h>
 
 // System dependencies.
 #include <cassert>
+#include <cstddef>
+#include <poll.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 // END Dependencies. ///////////////////////////////////////////////////////////
 
@@ -40,10 +44,24 @@ inline void quark::posix_tcp_socket::initialize(void) {
 }
 
 inline void quark::posix_tcp_socket::set_file_descriptor(const int fd) {
-    // Checking the precondition.
-    assert(fd >= 0);
-
     m_file_descriptor = fd;
+}
+
+void quark::posix_tcp_socket::poll_socket(void) {
+    struct pollfd pfd;
+
+    // Check if the file descriptor is assigned.
+    if(m_file_descriptor >= 0) {
+        pfd.fd = m_file_descriptor;
+        pfd.events = POLLNVAL | POLLHUP | POLLRDHUP;
+        pfd.revents = 0;
+        if(poll(&pfd, 1, 0) >= 1) {
+            close(m_file_descriptor);
+            set_file_descriptor(-1);
+            delete m_reader; m_reader = nullptr;
+            delete m_writer; m_writer = nullptr;
+        }
+    }
 }
 
 quark::posix_tcp_socket::posix_tcp_socket(void) {
@@ -52,7 +70,80 @@ quark::posix_tcp_socket::posix_tcp_socket(void) {
 
 quark::posix_tcp_socket::posix_tcp_socket(const int fd) {
     set_file_descriptor(fd);
-    // TODO Implement.
+    m_reader = new quark::posix_tcp_socket_reader(this);
+    m_writer = new quark::posix_tcp_socket_writer(this);
+}
+
+quark::posix_tcp_socket::~posix_tcp_socket(void) {
+    close_connection();
+    delete m_reader; m_reader = nullptr;
+    delete m_writer; m_writer = nullptr;
+}
+
+bool quark::posix_tcp_socket::is_connected(void) const {
+    // Poll the file descriptor.
+    poll_socket();
+
+    return (m_file_descriptor >= 0);
+}
+
+quark::reader * quark::posix_tcp_socket::get_reader(void) const {
+    return m_reader;
+}
+
+quark::writer * quark::posix_tcp_socket::get_writer(void) const {
+    return m_writer;
+}
+
+bool quark::posix_tcp_socket::create_connection(const std::string & address, const std::uint16_t port) {
+    int fd;
+
+    // Checking the precondition.
+    assert(!address.empty() && port > 0);
+
+    close_connection();
+    fd = quark::connect(address, port);
+    if(fd >= 0) {
+        // Set the file descriptor.
+        set_file_descriptor(fd);
+        // Allocate reader and writer.
+        m_reader = new quark::posix_tcp_socket_reader(this);
+        m_writer = new quark::posix_tcp_socket_writer(this);
+    }
+
+    return (fd >= 0);
+}
+
+void quark::posix_tcp_socket::set_send_timeout(const std::time_t seconds) {
+    struct timeval tv;
+
+    if(is_connected()) {
+        tv.tv_sec = seconds;
+        tv.tv_usec = 0;
+        setsockopt(m_file_descriptor, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof tv);
+    }
+}
+
+void quark::posix_tcp_socket::set_receive_timeout(const std::time_t seconds) {
+    struct timeval tv;
+
+    if(is_connected()) {
+        tv.tv_sec = seconds;
+        tv.tv_usec = 0;
+        setsockopt(m_file_descriptor, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv);
+    }
+}
+
+void quark::posix_tcp_socket::close_connection(void) {
+    // Check if the file descriptor is assigned.
+    if(m_file_descriptor >= 0) {
+        // Close the file descriptor.
+        close(m_file_descriptor);
+        set_file_descriptor(-1);
+        // Free allocated memory.
+        delete m_reader; m_reader = nullptr;
+        delete m_writer; m_writer = nullptr;
+    }
 }
 
 #endif

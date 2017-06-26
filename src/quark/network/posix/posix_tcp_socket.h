@@ -28,7 +28,7 @@
 
 // Application dependencies.
 #include <quark/io/reader/reader.h>
-#include <quark/io/writer/writher.h>
+#include <quark/io/writer/writer.h>
 
 // END Dependencies. ///////////////////////////////////////////////////////////
 
@@ -51,7 +51,7 @@ class posix_tcp_socket {
      * @note By default, this will be equal to -1. Same for a not-connected
      *       socket.
      */
-    mutable int m_file_descriptor;
+    int m_file_descriptor;
 
     /**
      * Reader associated with the POSIX TCP socket.
@@ -78,7 +78,7 @@ class posix_tcp_socket {
 
     inline void initialize(void);
 
-    void set_file_descriptor(const int fd);
+    inline void set_file_descriptor(const int fd);
 
     void poll_socket(void);
 
@@ -96,7 +96,7 @@ class posix_tcp_socket {
 
     // BEGIN Destructor. ///////////////////////////////////////////////////////
 
-    virtual ~posix_tcp_socket(void) = default;
+    virtual ~posix_tcp_socket(void);
 
     // END Destructor. /////////////////////////////////////////////////////////
 
@@ -108,7 +108,7 @@ class posix_tcp_socket {
 
     virtual quark::writer * get_writer(void) const;
 
-    virtual void create_connection(const std::string & address, const std::uint16_t port);
+    virtual bool create_connection(const std::string & address, const std::uint16_t port);
 
     virtual void set_receive_timeout(const std::time_t seconds);
 

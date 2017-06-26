@@ -79,7 +79,7 @@ class socket {
 
     virtual quark::writer * get_writer(void) const = 0;
 
-    virtual void create_connection(const std::string & address, const std::uint16_t port) = 0;
+    virtual bool create_connection(const std::string & address, const std::uint16_t port) = 0;
 
     virtual void set_receive_timeout(const std::time_t seconds) = 0;
 

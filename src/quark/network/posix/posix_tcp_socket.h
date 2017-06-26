@@ -1,5 +1,5 @@
 /**
- * Defines the interface of an abstract socket.
+ * Class representing the properties and actions of a TCP socket.
  *
  * @date                    26 June 2017
  * @author                  Joeri R. HERMANS
@@ -20,24 +20,21 @@
  * limitations under the License.
  */
 
-#ifndef QUARK_SOCKET_H_
-#define QUARK_SOCKET_H_
+#ifdef __unix__
+#ifndef QUARK_POSIX_TCP_SOCKET_H_
+#define QUARK_POSIX_TCP_SOCKET_H_
 
 // BEGIN Dependencies. /////////////////////////////////////////////////////////
 
 // Application dependencies.
 #include <quark/io/reader/reader.h>
-#include <quark/io/writer/writer.h>
-
-// System dependencies.
-#include <ctime>
-#include <string>
+#include <quark/io/writer/writher.h>
 
 // END Dependencies. ///////////////////////////////////////////////////////////
 
 namespace quark {
 
-class socket {
+class posix_tcp_socket {
 
     public:
 
@@ -47,6 +44,29 @@ class socket {
     private:
 
     // BEGIN Private members. //////////////////////////////////////////////////
+
+    /**
+     * Holds the file descriptor of the opened socket.
+     *
+     * @note By default, this will be equal to -1. Same for a not-connected
+     *       socket.
+     */
+    mutable int m_file_descriptor;
+
+    /**
+     * Reader associated with the POSIX TCP socket.
+     *
+     * @note Equal to the null reference if not connected.
+     */
+    quark::reader * m_reader;
+
+    /**
+     * Writer associated with the POSIX TCP socket.
+     *
+     * @note Equal to the null reference if not connected.
+     */
+    quark::writer * m_writer;
+
     // END Private members. ////////////////////////////////////////////////////
 
     // BEGIN Private methods. //////////////////////////////////////////////////
@@ -55,37 +75,46 @@ class socket {
     protected:
 
     // BEGIN Protected methods. ////////////////////////////////////////////////
+
+    inline void initialize(void);
+
+    void set_file_descriptor(const int fd);
+
+    void poll_socket(void);
+
     // END Protected methods. //////////////////////////////////////////////////
 
     public:
 
     // BEGIN Constructor. //////////////////////////////////////////////////////
 
-    socket(void) = default;
+    posix_tcp_socket(void);
+
+    posix_tcp_socket(const int file_descriptor);
 
     // END Constructor. ////////////////////////////////////////////////////////
 
     // BEGIN Destructor. ///////////////////////////////////////////////////////
 
-    virtual ~socket(void) = default;
+    virtual ~posix_tcp_socket(void) = default;
 
     // END Destructor. /////////////////////////////////////////////////////////
 
     // BEGIN Public methods. ///////////////////////////////////////////////////
 
-    virtual bool is_connected(void) const = 0;
+    virtual bool is_connected(void) const;
 
-    virtual quark::reader * get_reader(void) const = 0;
+    virtual quark::reader * get_reader(void) const;
 
-    virtual quark::writer * get_writer(void) const = 0;
+    virtual quark::writer * get_writer(void) const;
 
-    virtual void create_connection(const std::string & address, const std::uint16_t port) = 0;
+    virtual void create_connection(const std::string & address, const std::uint16_t port);
 
-    virtual void set_receive_timeout(const std::time_t seconds) = 0;
+    virtual void set_receive_timeout(const std::time_t seconds);
 
-    virtual void set_send_timeout(const std::time_t seconds) = 0;
+    virtual void set_send_timeout(const std::time_t seconds);
 
-    virtual void close_connection(void) = 0;
+    virtual void close_connection(void);
 
     // END Public methods. /////////////////////////////////////////////////////
 
@@ -96,4 +125,5 @@ class socket {
 
 };
 
+#endif
 #endif

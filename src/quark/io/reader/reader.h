@@ -25,6 +25,9 @@
 
 // BEGIN Dependencies. /////////////////////////////////////////////////////////
 
+// Application dependencies.
+#include <quark/types.h>
+
 // System Dependencies.
 #include <cstddef>
 #include <mutex>

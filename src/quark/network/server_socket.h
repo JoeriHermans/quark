@@ -90,13 +90,13 @@ class server_socket {
 
     // BEGIN Public methods. ///////////////////////////////////////////////////
 
-    std::uint16_t get_assigned_port(void) const {
+    std::uint16_t get_port(void) const {
         return m_port;
     }
 
-    virtual bool bind_to_port(void);
+    virtual bool bind_to_port(void) = 0;
 
-    virtual bool is_bound(void) const;
+    virtual bool is_bound(void) const = 0;
 
     virtual quark::socket * accept_socket(const std::time_t seconds) = 0;
 

@@ -27,12 +27,15 @@
 // Application dependencies.
 #include <quark/network/network_util.h>
 #include <quark/network/posix/posix_tcp_socket.h>
+#include <quark/io/reader/network/posix/posix_tcp_socket_reader.h>
+#include <quark/io/writer/network/posix/posix_tcp_socket_writer.h>
 
 // System dependencies.
 #include <cassert>
 #include <cstddef>
 #include <poll.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 // END Dependencies. ///////////////////////////////////////////////////////////
@@ -45,23 +48,6 @@ inline void quark::posix_tcp_socket::initialize(void) {
 
 inline void quark::posix_tcp_socket::set_file_descriptor(const int fd) {
     m_file_descriptor = fd;
-}
-
-void quark::posix_tcp_socket::poll_socket(void) {
-    struct pollfd pfd;
-
-    // Check if the file descriptor is assigned.
-    if(m_file_descriptor >= 0) {
-        pfd.fd = m_file_descriptor;
-        pfd.events = POLLNVAL | POLLHUP | POLLRDHUP;
-        pfd.revents = 0;
-        if(poll(&pfd, 1, 0) >= 1) {
-            close(m_file_descriptor);
-            set_file_descriptor(-1);
-            delete m_reader; m_reader = nullptr;
-            delete m_writer; m_writer = nullptr;
-        }
-    }
 }
 
 quark::posix_tcp_socket::posix_tcp_socket(void) {
@@ -80,9 +66,25 @@ quark::posix_tcp_socket::~posix_tcp_socket(void) {
     delete m_writer; m_writer = nullptr;
 }
 
+int quark::posix_tcp_socket::get_file_descriptor(void) const {
+    return m_file_descriptor;
+}
+
 bool quark::posix_tcp_socket::is_connected(void) const {
-    // Poll the file descriptor.
-    poll_socket();
+    struct pollfd pfd;
+
+    // Check if the file descriptor is assigned.
+    if(m_file_descriptor >= 0) {
+        pfd.fd = m_file_descriptor;
+        pfd.events = POLLNVAL | POLLHUP | POLLRDHUP;
+        pfd.revents = 0;
+        if(poll(&pfd, 1, 0) >= 1) {
+            close(m_file_descriptor);
+            m_file_descriptor = -1;
+            delete m_reader; m_reader = nullptr;
+            delete m_writer; m_writer = nullptr;
+        }
+    }
 
     return (m_file_descriptor >= 0);
 }

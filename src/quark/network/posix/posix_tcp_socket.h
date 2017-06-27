@@ -29,12 +29,13 @@
 // Application dependencies.
 #include <quark/io/reader/reader.h>
 #include <quark/io/writer/writer.h>
+#include <quark/network/socket.h>
 
 // END Dependencies. ///////////////////////////////////////////////////////////
 
 namespace quark {
 
-class posix_tcp_socket {
+class posix_tcp_socket : public socket {
 
     public:
 
@@ -51,21 +52,21 @@ class posix_tcp_socket {
      * @note By default, this will be equal to -1. Same for a not-connected
      *       socket.
      */
-    int m_file_descriptor;
+    mutable int m_file_descriptor;
 
     /**
      * Reader associated with the POSIX TCP socket.
      *
      * @note Equal to the null reference if not connected.
      */
-    quark::reader * m_reader;
+    mutable quark::reader * m_reader;
 
     /**
      * Writer associated with the POSIX TCP socket.
      *
      * @note Equal to the null reference if not connected.
      */
-    quark::writer * m_writer;
+    mutable quark::writer * m_writer;
 
     // END Private members. ////////////////////////////////////////////////////
 
@@ -79,8 +80,6 @@ class posix_tcp_socket {
     inline void initialize(void);
 
     inline void set_file_descriptor(const int fd);
-
-    void poll_socket(void);
 
     // END Protected methods. //////////////////////////////////////////////////
 
@@ -102,19 +101,21 @@ class posix_tcp_socket {
 
     // BEGIN Public methods. ///////////////////////////////////////////////////
 
+    int get_file_descriptor(void) const;
+
+    virtual bool create_connection(const std::string & address, const std::uint16_t port);
+
     virtual bool is_connected(void) const;
 
     virtual quark::reader * get_reader(void) const;
 
     virtual quark::writer * get_writer(void) const;
 
-    virtual bool create_connection(const std::string & address, const std::uint16_t port);
+    virtual void close_connection(void);
 
     virtual void set_receive_timeout(const std::time_t seconds);
 
     virtual void set_send_timeout(const std::time_t seconds);
-
-    virtual void close_connection(void);
 
     // END Public methods. /////////////////////////////////////////////////////
 

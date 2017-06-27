@@ -1,12 +1,11 @@
 /**
- * Abstract writer which is responsible for reading from more
- * specific implementations.
+ * Reader which is able to read bytes from a POSIX TCP socket.
  *
- * @date                    26 June 2017
+ * @date                    28 June 2017
  * @author                  Joeri R. HERMANS
  * @version                 0.1
  *
- * Copyright 2017 Joeri R. HERMANS
+ * Copyright 2016 Joeri R. HERMANS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,23 +20,21 @@
  * limitations under the License.
  */
 
-#ifndef QUARK_WRITER_H_
-#define QUARK_WRITER_H_
+#ifdef __unix__
+#ifndef QUARK_POSIX_TCP_SOCKET_READER_H_
+#define QUARK_POSIX_TCP_SOCKET_READER_H_
 
-// BEGIN Dependencies. /////////////////////////////////////////////////////////
+// BEGIN Includes. /////////////////////////////////////////////////////////////
 
 // Application dependencies.
-#include <quark/types.h>
+#include <quark/io/reader/reader.h>
+#include <quark/network/posix/posix_tcp_socket.h>
 
-// System dependencies.
-#include <cstddef>
-#include <mutex>
-
-// END Dependencies. ///////////////////////////////////////////////////////////
+// END Includes. ///////////////////////////////////////////////////////////////
 
 namespace quark {
 
-class writer {
+class posix_tcp_socket_reader : public reader {
 
     public:
 
@@ -49,14 +46,16 @@ class writer {
     // BEGIN Private members. //////////////////////////////////////////////////
 
     /**
-     * Mutex which is responsible for locking the writer during asynchronous
-     * operations.
+     * Holds the socket from which the reader will read bytes.
      */
-    std::mutex m_lock;
+    quark::posix_tcp_socket * m_socket;
 
     // END Private members. ////////////////////////////////////////////////////
 
     // BEGIN Private methods. //////////////////////////////////////////////////
+
+    inline void set_socket(quark::posix_tcp_socket * socket);
+
     // END Private methods. ////////////////////////////////////////////////////
 
     protected:
@@ -68,33 +67,25 @@ class writer {
 
     // BEGIN Constructor. //////////////////////////////////////////////////////
 
-    writer(void) = default;
+    posix_tcp_socket_reader(quark::posix_tcp_socket * socket);
 
     // END Constructor. ////////////////////////////////////////////////////////
 
     // BEGIN Destructor. ///////////////////////////////////////////////////////
 
-    virtual ~writer(void) = default;
+    virtual ~posix_tcp_socket_reader(void);
 
     // END Destructor. /////////////////////////////////////////////////////////
 
     // BEGIN Public methods. ///////////////////////////////////////////////////
 
-    virtual std::ssize_t write_all(const char * buffer, const std::size_t size) = 0;
+    virtual std::ssize_t read_all(char * buffer, const std::size_t size);
 
-    virtual std::ssize_t write_byte(const char byte) = 0;
+    virtual std::ssize_t read_byte(char * byte);
 
-    virtual std::ssize_t write_bytes(const char * buffer, const std::size_t size) = 0;
+    virtual std::ssize_t read_bytes(char * buffer, const std::size_t size);
 
-    virtual void close_writer(void) = 0;
-
-    virtual void lock(void) {
-        m_lock.lock();
-    }
-
-    virtual void unlock(void) {
-        m_lock.unlock();
-    }
+    virtual void close_reader(void);
 
     // END Public methods. /////////////////////////////////////////////////////
 
@@ -105,4 +96,5 @@ class writer {
 
 };
 
+#endif
 #endif

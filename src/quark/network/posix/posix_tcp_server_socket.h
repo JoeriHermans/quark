@@ -1,11 +1,12 @@
 /**
- * Class representing the properties and actions of a TCP socket.
+ * Class which describes the properties and actions of a listening
+ * POSIX TCP socket.
  *
- * @date                    26 June 2017
+ * @date                    TODO
  * @author                  Joeri R. HERMANS
  * @version                 0.1
  *
- * Copyright 2017 Joeri R. HERMANS
+ * Copyright 2016 Joeri R. HERMANS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +22,19 @@
  */
 
 #ifdef __unix__
-#ifndef QUARK_POSIX_TCP_SOCKET_H_
-#define QUARK_POSIX_TCP_SOCKET_H_
+#ifndef QUARK_POSIX_TCP_SERVER_SOCKET_H_
+#define QUARK_POSIX_TCP_SERVER_SOCKET_H_
 
-// BEGIN Dependencies. /////////////////////////////////////////////////////////
+// BEGIN Includes. /////////////////////////////////////////////////////////////
 
 // Application dependencies.
-#include <quark/io/reader/reader.h>
-#include <quark/io/writer/writher.h>
+#include <quark/network/server_socket.h>
 
-// END Dependencies. ///////////////////////////////////////////////////////////
+// END Includes. ///////////////////////////////////////////////////////////////
 
 namespace quark {
 
-class posix_tcp_socket {
+class posix_tcp_server_socket : public server_socket {
 
     public:
 
@@ -46,77 +46,50 @@ class posix_tcp_socket {
     // BEGIN Private members. //////////////////////////////////////////////////
 
     /**
-     * Holds the file descriptor of the opened socket.
-     *
-     * @note By default, this will be equal to -1. Same for a not-connected
-     *       socket.
+     * Holds the file descriptor of the listening socket.
      */
-    mutable int m_file_descriptor;
-
-    /**
-     * Reader associated with the POSIX TCP socket.
-     *
-     * @note Equal to the null reference if not connected.
-     */
-    quark::reader * m_reader;
-
-    /**
-     * Writer associated with the POSIX TCP socket.
-     *
-     * @note Equal to the null reference if not connected.
-     */
-    quark::writer * m_writer;
+    int m_file_descriptor;
 
     // END Private members. ////////////////////////////////////////////////////
 
     // BEGIN Private methods. //////////////////////////////////////////////////
+
+    inline void initialize(void);
+
     // END Private methods. ////////////////////////////////////////////////////
 
     protected:
 
     // BEGIN Protected methods. ////////////////////////////////////////////////
-
-    inline void initialize(void);
-
-    void set_file_descriptor(const int fd);
-
-    void poll_socket(void);
-
     // END Protected methods. //////////////////////////////////////////////////
 
     public:
 
     // BEGIN Constructor. //////////////////////////////////////////////////////
 
-    posix_tcp_socket(void);
+    posix_tcp_server_socket(void);
 
-    posix_tcp_socket(const int file_descriptor);
+    posix_tcp_server_socket(const std::uint16_t port);
 
     // END Constructor. ////////////////////////////////////////////////////////
 
     // BEGIN Destructor. ///////////////////////////////////////////////////////
 
-    virtual ~posix_tcp_socket(void) = default;
+    virtual ~posix_tcp_server_socket(void);
 
     // END Destructor. /////////////////////////////////////////////////////////
 
     // BEGIN Public methods. ///////////////////////////////////////////////////
 
-    virtual bool is_connected(void) const;
+    virtual bool bind_to_port(void);
 
-    virtual quark::reader * get_reader(void) const;
+    virtual bool is_bound(void) const;
 
-    virtual quark::writer * get_writer(void) const;
+    virtual quark::socket * accept_socket(const std::time_t seconds);
 
-    virtual void create_connection(const std::string & address);
+    virtual quark::socket * accept_socket(void);
 
-    virtual void create_connection(const std::string & address, const std::uint16_t port);
-
-    virtual void set_receive_timeout(const std::time_t seconds);
-
-    virtual void set_send_timeout(const std::time_t seconds);
-
-    virtual void close_connection(void);
+    virtual void stop_listening(void);
 
     // END Public methods. /////////////////////////////////////////////////////
 

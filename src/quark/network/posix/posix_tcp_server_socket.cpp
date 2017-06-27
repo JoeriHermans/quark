@@ -110,8 +110,6 @@ quark::socket * quark::posix_tcp_server_socket::accept_socket(const std::time_t 
 }
 
 quark::socket * quark::posix_tcp_server_socket::accept_socket(void) {
-    struct sockaddr addr;
-    socklen_t addr_length;
     quark::socket *  s;
     int fd;
 
@@ -120,8 +118,6 @@ quark::socket * quark::posix_tcp_server_socket::accept_socket(void) {
 
     s = nullptr;
     if(is_bound()) {
-        memset(&addr, 0, sizeof addr);
-        memset(&addr_length, 0, sizeof addr_length);
         fd = accept(m_file_descriptor, &addr, &addr_length);
         if(fd >= 0)
             s = new quark::posix_tcp_socket(fd);

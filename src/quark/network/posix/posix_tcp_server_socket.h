@@ -56,6 +56,8 @@ class posix_tcp_server_socket : public server_socket {
 
     inline void initialize(void);
 
+    inline void set_file_descriptor(const int fd);
+
     // END Private methods. ////////////////////////////////////////////////////
 
     protected:
@@ -66,8 +68,6 @@ class posix_tcp_server_socket : public server_socket {
     public:
 
     // BEGIN Constructor. //////////////////////////////////////////////////////
-
-    posix_tcp_server_socket(void);
 
     posix_tcp_server_socket(const std::uint16_t port);
 

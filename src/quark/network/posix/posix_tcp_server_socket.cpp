@@ -106,6 +106,8 @@ quark::socket * quark::posix_tcp_server_socket::accept_socket(const std::time_t 
     // Checking the precondition.
     assert(is_bound());
 
+    // TODO Implement.
+
     return nullptr;
 }
 
@@ -118,7 +120,7 @@ quark::socket * quark::posix_tcp_server_socket::accept_socket(void) {
 
     s = nullptr;
     if(is_bound()) {
-        fd = accept(m_file_descriptor, &addr, &addr_length);
+        fd = accept(m_file_descriptor, nullptr, nullptr);
         if(fd >= 0)
             s = new quark::posix_tcp_socket(fd);
     }
